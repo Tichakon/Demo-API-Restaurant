@@ -5,20 +5,22 @@ services:
     container_name: php
     build: ./
     image: php-api.restaurant.tichaky.com
-    volumes:
-      - './:/var/www/html'
-    restart: always
-    command: bash -c "composer install"
-  webserver:
-    container_name: nginx
-    image: nginx:latest
     ports:
       - '3001:80'
     volumes:
-      - './servers/nginx/config:/etc/nginx/conf.d:ro'
-      - './servers/nginx/logs:/var/log/nginx'
       - './:/var/www/html'
     restart: always
+    command: bash -c "composer install && php artisan serve --host=0.0.0.0 --port=80"
+  # webserver:
+  #   container_name: nginx
+  #   image: nginx:latest
+  #   ports:
+  #     - '3001:80'
+  #   volumes:
+  #     - './servers/nginx/config:/etc/nginx/conf.d:ro'
+  #     - './servers/nginx/logs:/var/log/nginx'
+  #     - './:/var/www/html'
+  #   restart: always
   cache:
     container_name: redis-stack
     image: redis/redis-stack:latest
@@ -30,5 +32,5 @@ services:
     volumes:
       - './servers/redis/cache:/data'
       - './servers/redis/config:/etc/redis'
-      - '/var/run/docker.sock:/var/run/docker.sock'
+      # - '/var/run/docker.sock:/var/run/docker.sock'
     restart: always
