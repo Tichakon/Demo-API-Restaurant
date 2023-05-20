@@ -1,0 +1,78 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  # test:
+  #   name: Test
+  #   runs-on: ${{ matrix.os }}
+
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest]
+  #       node: [14]
+
+  #   steps:
+  #     - name: Checkout 🛎
+  #       uses: actions/checkout@main
+
+  #     - name: Setup node env 🏗
+  #       uses: actions/setup-node@v3.0.0
+  #       with:
+  #         node-version: ${{ matrix.node }}
+  #         check-latest: true
+
+  #     - name: Cache node_modules 📦
+  #       uses: actions/cache@v2.1.7
+  #       with:
+  #         path: ~/.npm
+  #         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-node-
+
+  #     - name: Install dependencies 👨🏻‍💻
+  #       run: npm ci --prefer-offline --no-audit
+
+  #     - name: Run linter 👀
+  #       run: npm run lint
+
+  #     - name: Run tests 🧪
+  #       run: npm run test
+  production:
+    name: production
+    # needs: [test]
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        # node: [14]
+
+    steps:
+      - name: Test Set Environment
+        run: |
+          echo ${{ secrets.TEST }}
+
+      - name: Set Key 🛎
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ../private.key
+          sudo chmod 600 ../private.key
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+
+      - name: Connect and pull code
+        run: |
+          ssh -i ../private.key ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} -C "cd /home/iu/api.restaurant.tichaky.com && git fetch && git pull"
+
+      - name: Deploy to docker
+        run: |
+          ssh  -i ../private.key ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} -C "cd /home/iu/api.restaurant.tichaky.com && docker build -t php-api.restaurant.tichaky.com ."
+          ssh  -i ../private.key ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} -C "cd /home/iu/api.restaurant.tichaky.com && docker compose -f docker-compose.yml up -d"
