@@ -64,3 +64,20 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Install to docker
+
+```bash
+# Copy .env.example to .env
+$ cp .env.example .env
+
+# Change to env variable REDIS_HOST to ip myself
+REDIS_HOST=192.168.1.21
+
+# Change to env variable GOOGLE_MAPS_API_KEY to google map api 
+GOOGLE_MAPS_API_KEY=xxx
+
+# Run Docker
+docker compose -f docker-compose.yml up -d
+
+```
