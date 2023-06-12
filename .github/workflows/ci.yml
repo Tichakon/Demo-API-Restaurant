@@ -75,4 +75,5 @@ jobs:
       - name: Deploy to docker
         run: |
           ssh  -i ../private.key ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} -C "cd /home/iu/api.restaurant.tichaky.com && docker build -t php-api.restaurant.tichaky.com ."
+          ssh  -i ../private.key ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} -C "cd /home/iu/api.restaurant.tichaky.com && docker-compose down"
           ssh  -i ../private.key ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} -C "cd /home/iu/api.restaurant.tichaky.com && docker compose -f docker-compose.yml up -d"
